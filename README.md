@@ -1,46 +1,77 @@
-# graspclutter6dAPI
+# GraspClutter6D API
 
-- toolkit for GraspClutter6D Dataset
-- load 6D grasp pose annotation, and grasp evaluation for benchmarking
-- support compatibility with [graspnetAPI](https://github.com/graspnet/graspnetAPI) of GraspNet-1B
+<div align="center">
+  <img src="./example.jpg" alt="GraspClutter6D example visualization">
+</div>
+
+## Overview
+
+GraspClutter6D API is a comprehensive toolkit for working with the GraspClutter6D Dataset. This library provides functionality to:
+
+- Load and manipulate 6D grasp pose annotations
+- Perform grasp evaluation for benchmarking
+- Maintain compatibility with [graspnetAPI](https://github.com/graspnet/graspnetAPI) from GraspNet-1B
 
 ## Dataset
 
-Dataset is available at [GraspClutter6D Website](https://huggingface.co/datasets/GraspClutter6D/graspclutter6d) via huggingface.
+The GraspClutter6D Dataset is available through Hugging Face:
+[GraspClutter6D Dataset](https://huggingface.co/datasets/GraspClutter6D/graspclutter6d)
 
-## Install
+## Installation
 
-Install it via pip
+### Option 1: Install via pip
+
+```bash
+pip install graspclutter6dAPI
 ```
-pip install graspclutter6dAP
-```
 
-Or install it at local
+### Option 2: Install from source
 
-```
+```bash
+# Create and activate conda environment
 conda create -n gc6d python=3.8
 conda activate gc6d
+
+# Clone repository and install in development mode
+git clone https://github.com/username/graspclutter6dAPI.git
+cd graspclutter6dAPI
 pip install -e .
-
 ```
 
-## Examples
+## Environment Setup
 
-```
-# Set env
-export GC6D_ROOT='/SSD1/graspclutter6d'
+Before running the examples, set the environment variable to point to your dataset location:
 
-# Check the completeness of the data.
-python3 exam_check_data.py
-
-# How to load labels from GraspClutter6D
-python3 exam_loadGrasp.py
-
-# How to visualize the annotations
-python3 exam_vis.py
+```bash
+export GC6D_ROOT='/path/to/graspclutter6d'
 ```
 
-## References
+## Usage Examples
 
-The codes of this repository are built upon the graspnetAPI. 
-Thanks to the authors for sharing the code!
+### Validate Dataset Integrity
+
+Check if the downloaded dataset is complete and properly structured:
+
+```bash
+python examples/exam_check_data.py
+```
+
+### Load Grasp Annotations
+
+Load and process grasp annotations from the GraspClutter6D dataset:
+
+```bash
+python examples/exam_loadGrasp.py
+```
+
+### Visualize Grasp Annotations
+
+Generate visualizations of grasp poses and objects:
+
+```bash
+python examples/exam_vis.py
+```
+
+## Acknowledgments
+
+This repository is built upon the [graspnetAPI](https://github.com/graspnet/graspnetAPI). We thank the authors for sharing their code.
