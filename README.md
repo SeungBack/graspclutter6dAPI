@@ -6,7 +6,7 @@
 
 ## Overview
 
-GraspClutter6D API is a comprehensive toolkit for working with the [GraspClutter6D Dataset](https://huggingface.co/datasets/GraspClutter6D/graspclutter6d). 
+GraspClutter6D API is a comprehensive toolkit for working with the [GraspClutter6D Dataset](https://sites.google.com/view/graspclutter6d). 
 
 - Load and manipulate 6D grasp pose annotations
 - Perform grasp evaluation for benchmarking
@@ -14,7 +14,7 @@ GraspClutter6D API is a comprehensive toolkit for working with the [GraspClutter
 
 ## Dataset
 
-The GraspClutter6D Dataset is available through Hugging Face: [GraspClutter6D Dataset](https://huggingface.co/datasets/GraspClutter6D/graspclutter6d)
+The GraspClutter6D Dataset is available through [Hugging Face:](https://huggingface.co/datasets/GraspClutter6D/graspclutter6d)
 
 ## Installation
 
