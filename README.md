@@ -1,8 +1,6 @@
 # GraspClutter6D API
 
-<div align="center">
-  <img src="./example.jpg" alt="GraspClutter6D example visualization">
-</div>
+<img src='./example.jpg' width='100%' >
 
 ## Overview
 
