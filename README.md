@@ -1,6 +1,6 @@
 # GraspClutter6D API
 
-<img src='./example.jpg' width='100%' >
+![Example](./example.jpg)
 
 ## Overview
 
