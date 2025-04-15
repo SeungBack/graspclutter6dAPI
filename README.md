@@ -12,7 +12,7 @@ GraspClutter6D API is a comprehensive toolkit for working with the [GraspClutter
 
 ## Dataset
 
-The GraspClutter6D Dataset is available through [Hugging Face:](https://huggingface.co/datasets/GraspClutter6D/graspclutter6d)
+The GraspClutter6D Dataset is available through [Hugging Face](https://huggingface.co/datasets/GraspClutter6D/graspclutter6d)
 
 ## Installation
 
@@ -30,7 +30,7 @@ conda create -n gc6d python=3.8
 conda activate gc6d
 
 # Clone repository and install in development mode
-git clone https://github.com/username/graspclutter6dAPI.git
+git clone https://github.com/SeungBack/graspclutter6dAPI.git
 cd graspclutter6dAPI
 pip install -e .
 ```
