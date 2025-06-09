@@ -83,8 +83,6 @@ class GraspClutter6D():
         self.rgbPath = []
         self.depthPath = []
         self.segLabelPath = []
-        self.metaPath = []
-        self.rectLabelPath = []
         self.sceneName = []
         self.annId = []
 
@@ -104,11 +102,7 @@ class GraspClutter6D():
                 self.depthPath.append(os.path.join(
                     root, 'scenes', str(i).zfill(6), 'depth', str(img_num).zfill(6)+'.png'))
                 self.segLabelPath.append(os.path.join(
-                    root, 'scenes', 'scene_'+str(i).zfill(4), camera, 'label', str(img_num).zfill(4)+'.png'))
-                self.metaPath.append(os.path.join(
-                    root, 'scenes', 'scene_'+str(i).zfill(4), camera, 'meta', str(img_num).zfill(4)+'.mat'))
-                self.rectLabelPath.append(os.path.join(
-                    root, 'scenes', 'scene_'+str(i).zfill(4), camera, 'rect', str(img_num).zfill(4)+'.npy'))
+                    root, 'scenes', str(i).zfill(6), 'label', str(img_num).zfill(6)+'.png'))
                 self.sceneName.append('scene_'+str(i).zfill(4))
                 self.annId.append(ann_id)
         self.objIds = self.getObjIds(self.sceneIds)
@@ -452,7 +446,7 @@ class GraspClutter6D():
         return workspace_mask
     
 
-    def loadScenePointCloud(self, sceneId, camera, annId, align=False, format = 'open3d', use_workspace=True, use_mask = True, use_inpainting = False):
+    def loadScenePointCloud(self, sceneId, camera, annId, format = 'open3d', use_workspace=True, use_mask = True, use_inpainting = False):
         '''
         **Input:**
 
@@ -461,8 +455,6 @@ class GraspClutter6D():
         - camera: string of type of camera
 
         - annId: int of the annotation index.
-
-        - aligh: bool of whether align to the table frame.
 
         - format: string of the returned type. 'open3d' or 'numpy'
 
@@ -748,17 +740,15 @@ class GraspClutter6D():
         - if ids is not specified or is a list, returns a tuple of data path lists
         '''
         if ids is None:
-            return (self.rgbPath, self.depthPath, self.segLabelPath, self.metaPath, self.rectLabelPath, self.sceneName, self.annId)
+            return (self.rgbPath, self.depthPath, self.segLabelPath, self.sceneName, self.annId)
         
         if len(extargs) == 0:
             if isinstance(ids, int):
-                return (self.rgbPath[ids], self.depthPath[ids], self.segLabelPath[ids], self.metaPath[ids], self.rectLabelPath[ids], self.sceneName[ids], self.annId[ids])
+                return (self.rgbPath[ids], self.depthPath[ids], self.segLabelPath[ids], self.sceneName[ids], self.annId[ids])
             else:
                 return ([self.rgbPath[id] for id in ids],
                     [self.depthPath[id] for id in ids],
                     [self.segLabelPath[id] for id in ids],
-                    [self.metaPath[id] for id in ids],
-                    [self.rectLabelPath[id] for id in ids],
                     [self.sceneName[id] for id in ids],
                     [self.annId[id] for id in ids])
         if len(extargs) == 2:
@@ -767,10 +757,8 @@ class GraspClutter6D():
             rgbPath = os.path.join(self.root, 'scenes', 'scene_'+str(sceneId).zfill(4), camera, 'rgb', str(annId).zfill(4)+'.png')
             depthPath = os.path.join(self.root, 'scenes', 'scene_'+str(sceneId).zfill(4), camera, 'depth', str(annId).zfill(4)+'.png')
             segLabelPath = os.path.join(self.root, 'scenes', 'scene_'+str(sceneId).zfill(4), camera, 'label', str(annId).zfill(4)+'.png')
-            metaPath = os.path.join(self.root, 'scenes', 'scene_'+str(sceneId).zfill(4), camera, 'meta', str(annId).zfill(4)+'.mat')
-            rectLabelPath = os.path.join(self.root, 'scenes', 'scene_'+str(sceneId).zfill(4), camera, 'rect', str(annId).zfill(4)+'.npy')
             scene_name = 'scene_'+str(sceneId).zfill(4)
-            return (rgbPath, depthPath, segLabelPath, metaPath, rectLabelPath, scene_name,annId)
+            return (rgbPath, depthPath, segLabelPath, scene_name,annId)
 
     def showObjGrasp(self, objIds=[], numGrasp=10, th=0.5, maxWidth=0.08, saveFolder='save_fig', show=False):
         '''
