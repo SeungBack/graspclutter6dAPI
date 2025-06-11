@@ -404,7 +404,7 @@ class GraspClutter6D():
         '''
         return cv2.imread(os.path.join(self.root, 'scenes', '%06d' % sceneId, 'label', '%06d.png' % self.annId2ImgId(annId, camera)), cv2.IMREAD_UNCHANGED)[:,:,0]
    
-    def loadWorkSpace(self, cloud, seg, organized=True, outlier=0):
+    def loadWorkSpaceMask(self, cloud, seg, organized=True, outlier=0):
         """ Keep points in workspace as input.
 
             Input:
@@ -446,7 +446,30 @@ class GraspClutter6D():
         return workspace_mask
     
 
-    def loadScenePointCloud(self, sceneId, camera, annId, format = 'open3d', use_workspace=True, use_mask = True, use_inpainting = False):
+    def loadWorkSpace(self, sceneId, camera, annId):
+        '''
+        **Input:**
+
+        - sceneId: int of the scene index.
+        
+        - camera: string of type of camera, 'realsense' or 'kinect'
+
+        - annId: int of the annotation index.
+
+        **Output:**
+
+        - tuple of the bounding box coordinates (x1, y1, x2, y2).
+        '''
+        mask = self.loadMask(sceneId, camera, annId)
+        maskx = np.any(mask, axis=0)
+        masky = np.any(mask, axis=1)
+        x1 = np.argmax(maskx)
+        y1 = np.argmax(masky)
+        x2 = len(maskx) - np.argmax(maskx[::-1])
+        y2 = len(masky) - np.argmax(masky[::-1]) 
+        return (x1, y1, x2, y2)
+
+    def loadScenePointCloud(self, sceneId, camera, annId, format = 'open3d', use_workspace=True, margin=0.1, use_mask = True, use_inpainting = False):
         '''
         **Input:**
 
@@ -490,11 +513,12 @@ class GraspClutter6D():
         elif camera in ['azure-kinect', 'zivid']:
             s = 10000.0
         
-        if align:
-            camera_poses = np.load(os.path.join(self.root, 'scenes', 'scene_%04d' % sceneId, camera, 'camera_poses.npy'))
-            camera_pose = camera_poses[imgId]
-            align_mat = np.load(os.path.join(self.root, 'scenes', 'scene_%04d' % sceneId, camera, 'cam0_wrt_table.npy'))
-            camera_pose = align_mat.dot(camera_pose)
+        #!TODO: support align
+        # if align:
+        #     camera_poses = np.load(os.path.join(self.root, 'scenes', 'scene_%04d' % sceneId, camera, 'camera_poses.npy'))
+        #     camera_pose = camera_poses[imgId]
+        #     align_mat = np.load(os.path.join(self.root, 'scenes', 'scene_%04d' % sceneId, camera, 'cam0_wrt_table.npy'))
+        #     camera_pose = align_mat.dot(camera_pose)
 
         xmap, ymap = np.arange(colors.shape[1]), np.arange(colors.shape[0])
         xmap, ymap = np.meshgrid(xmap, ymap)
@@ -502,25 +526,36 @@ class GraspClutter6D():
         points_x = (xmap - cx) / fx * points_z
         points_y = (ymap - cy) / fy * points_z
 
-    
-
         points = np.stack([points_x, points_y, points_z], axis=-1)
-
         if use_workspace:
-            seg = self.loadMask(sceneId, camera, annId)
-            workspace_mask = self.loadWorkSpace(points, seg, outlier=0.1)
-            points = points[workspace_mask]
-            colors = colors[workspace_mask]
+            (x1, y1, x2, y2) = self.loadWorkSpace(sceneId, camera, annId)
+            w_margin = int(colors.shape[1] * margin)
+            h_margin = int(colors.shape[0] * margin)
+            x1 = max(0, x1 - w_margin)
+            y1 = max(0, y1 - h_margin)
+            x2 = min(colors.shape[1], x2 + w_margin)
+            y2 = min(colors.shape[0], y2 + h_margin)
+            points = points[y1:y2, x1:x2]
+            colors = colors[y1:y2, x1:x2]
+
+            # seg = self.loadMask(sceneId, camera, annId)
+            # workspace_mask = self.loadWorkSpaceMask(points, seg, outlier=0.1)
+            # points = points[workspace_mask]
+            # colors = colors[workspace_mask]
 
         if use_mask:
-            mask = (points[:,2] > 0)
+            if points.ndim == 3:
+                mask = points[:, :, 2] > 0
+            else:
+                mask = points[:, 2] > 0
             points = points[mask]
             colors = colors[mask]
         else:
             points = points.reshape((-1, 3))
             colors = colors.reshape((-1, 3))
-        if align:
-            points = transform_points(points, camera_pose)
+        
+        # if align: #!TODO: support align
+            # points = transform_points(points, camera_pose)
 
         if format == 'open3d':
             cloud = o3d.geometry.PointCloud()
