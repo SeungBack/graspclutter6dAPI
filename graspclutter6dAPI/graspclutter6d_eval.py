@@ -130,7 +130,8 @@ class GraspClutter6DEval(GraspClutter6D):
             obj_list.append(obj['obj_id'])
         return obj_list, pose_list, camera_pose
         
-    def eval_scene(self, sceneId, dump_folder, TOP_K = 50, return_list = False,vis = False, max_width = 0.14):
+    def eval_scene(self, sceneId, dump_folder, TOP_K = 50, return_list = False, 
+                   vis = False, max_width = 0.14, background_filter = True):
         '''
         **Input:**
 
@@ -145,6 +146,8 @@ class GraspClutter6DEval(GraspClutter6D):
         - vis: bool of whether to show the result
 
         - max_width: float of the maximum gripper width in evaluation
+
+        - background_filter: bool of whether to filter the background grasps
 
         **Output:**
 
@@ -185,6 +188,19 @@ class GraspClutter6DEval(GraspClutter6D):
             gg_array[min_width_mask,1] = 0
             gg_array[max_width_mask,1] = max_width
             grasp_group.grasp_group_array = gg_array
+
+            if background_filter:
+                # leave only grasps that are close to the objects
+                model_sampled_all = [transform_points(model_sampled, pose) for model_sampled, pose in zip(model_sampled_list, pose_list)]
+                model_sampled_all = np.concatenate(model_sampled_all, axis=0)
+                dist = compute_point_distance(grasp_group.grasp_group_array[:,13:16], model_sampled_all)
+                closest_dist = np.min(dist, axis=1)
+                close_mask = closest_dist < 0.05
+                grasp_group = grasp_group[close_mask]
+                # visualize
+                # cloud = o3d.geometry.PointCloud()
+                # cloud.points = o3d.utility.Vector3dVector(model_sampled_all)
+                # o3d.visualization.draw_geometries([cloud, *grasp_group.to_open3d_geometry_list()])
 
             grasp_list, score_list, collision_mask_list = eval_grasp(grasp_group, model_sampled_list, dexmodel_list, pose_list, config, voxel_size=0.008, TOP_K = TOP_K)
 
