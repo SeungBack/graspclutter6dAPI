@@ -206,6 +206,7 @@ class GraspClutter6D():
         for i in sceneIds:
             f = open(os.path.join(self.root, 'split_info', 'obj_ids_per_scene.json'))
             objIds += json.load(f)[str(i)]
+        objIds = list(set(objIds))
         return objIds
 
     def getDataIds(self, sceneIds=None):
@@ -658,7 +659,7 @@ class GraspClutter6D():
         assert camera in ['realsense-d415', 'realsense-d435', 'azure-kinect', 'zivid'], 'camera should be realsense-d415/realsense-d435/azure-kinect/zivid'
         assert format == '6d' or format == 'rect', 'format must be "6d" or "rect"'
         if format == '6d':
-            from .utils.utils import get_obj_pose_list, generate_views, get_model_grasps, transform_points
+            from .utils.utils import generate_views, transform_points
             from .utils.rotation import batch_viewpoint_params_to_matrix
             
             imgId = self.annId2ImgId(annId, camera)
@@ -733,7 +734,6 @@ class GraspClutter6D():
                 mask1 = ((fric_coefs <= fric_coef_thresh) & (fric_coefs > 0) & ~collision)
                 target_points = target_points[mask1]
                 target_points = transform_points(target_points, trans)
-                #target_points = transform_points(target_points, np.linalg.inv(camera_pose))
                 views = views[mask1]
                 angles = angles[mask1]
                 depths = depths[mask1]
@@ -742,7 +742,6 @@ class GraspClutter6D():
 
                 Rs = batch_viewpoint_params_to_matrix(-views, angles)
                 Rs = np.matmul(trans[np.newaxis, :3, :3], Rs)
-                #Rs = np.matmul(np.linalg.inv(camera_pose)[np.newaxis,:3,:3], Rs)
 
                 num_grasp = widths.shape[0]
                 scores = (1.1 - fric_coefs).reshape(-1,1)
@@ -756,7 +755,7 @@ class GraspClutter6D():
                 grasp_group.grasp_group_array = np.concatenate((grasp_group.grasp_group_array, obj_grasp_array))
             return grasp_group
         else:
-            # 'rect'
+            raise NotImplementedError('Rect grasp loading not implemented yet.')
             rect_grasps = RectGraspGroup(os.path.join(self.root,'scenes','scene_%04d' % sceneId,camera,'rect','%04d.npy' % annId))
             return rect_grasps
 

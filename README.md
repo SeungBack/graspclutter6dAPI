@@ -28,12 +28,10 @@ conda create -n gc6d python=3.8
 conda activate gc6d
 
 # Clone repository and install in development mode
-git clone https://github.com/SeungBack/graspclutter6dAPI.git
-cd graspclutter6dAPI
-pip install -e .
+pip install git+https://github.com/seungback/graspnetAPI.git
 ```
 
-### Option 2: Install via pip
+### Option 2: Install via pip (Deprecated)
 
 ```bash
 pip install graspclutter6dAPI
