@@ -6,9 +6,15 @@
 
 ## Overview
 
-This repository contains dataset toolkit for the paper "**GraspClutter6D: A Large-scale Real-world Dataset for Robust Perception and Grasping in Cluttered Scenes**." (RA-L 2025) 
+This repository contains dataset toolkit for the paper "**GraspClutter6D: A Large-scale Real-world Dataset for Robust Perception and Grasping in Cluttered Scenes**." (RA-L 2025 & ICRA 2026) 
 
 [[ArXiv]](https://arxiv.org/abs/2504.06866) [[Website]](https://sites.google.com/view/graspclutter6d) [[Dataset]](https://huggingface.co/datasets/GraspClutter6D/GraspClutter6D) [[Video]](https://youtu.be/NkKkfVS5wZ4)
+
+| Repository | Description |
+|---|---|
+| **graspclutter6dAPI** | Dataset toolkit — annotation loading, grasp evaluation **(this repo)** |
+| [gc6d-pose-anno](https://github.com/SeungBack/gc6d-pose-anno) | 6D object pose annotation tool (BOP format) |
+| [gc6d-contact-graspnet](https://github.com/SeungBack/gc6d-contact-graspnet) | 6-DoF grasp detection baseline |
 
 - Load and manipulate 6D grasp pose annotations
 - Perform grasp evaluation for benchmarking
