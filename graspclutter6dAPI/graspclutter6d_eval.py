@@ -81,6 +81,7 @@ class GraspClutter6DEval(GraspClutter6D):
                 dexmodel = load_dexnet_model(os.path.join(self.root, 'models_obj_m', 'obj_%06d' % obj_idx))
                 # save dexmodel
                 print('Saving dexmodel to {}'.format(dex_cache_path) + ' It may take a while, but only need to run once.')
+                os.makedirs(os.path.dirname(dex_cache_path), exist_ok=True)
                 with open(dex_cache_path, 'wb') as f:
                     pickle.dump(dexmodel, f)
             points = np.array(model.points)
