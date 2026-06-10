@@ -700,7 +700,7 @@ class GraspClutter6D():
             collision_dump = collision_labels[str(sceneId).zfill(6)]
 
             if remove_invisible:
-                scene_cloud = self.loadScenePointCloud(sceneId, camera, annId, align=False, format='image_space')
+                scene_cloud = self.loadScenePointCloud(sceneId, camera, annId, format='image_space')
 
             # grasp = dict()
             grasp_group = GraspGroup()
@@ -755,9 +755,16 @@ class GraspClutter6D():
                 grasp_group.grasp_group_array = np.concatenate((grasp_group.grasp_group_array, obj_grasp_array))
             return grasp_group
         else:
-            raise NotImplementedError('Rect grasp loading not implemented yet.')
-            rect_grasps = RectGraspGroup(os.path.join(self.root,'scenes','scene_%04d' % sceneId,camera,'rect','%04d.npy' % annId))
-            return rect_grasps
+            # convert 6d grasps to rectangle grasps on-the-fly using per-scene intrinsics
+            _6d_grasp = self.loadGrasp(sceneId=sceneId, annId=annId, format='6d', camera=camera,
+                                       grasp_labels=grasp_labels, collision_labels=collision_labels,
+                                       fric_coef_thresh=fric_coef_thresh, remove_invisible=remove_invisible)
+            imgId = self.annId2ImgId(annId, camera)
+            scene_camera_path = os.path.join(self.root, 'scenes', '%06d' % sceneId, 'scene_camera.json')
+            with open(scene_camera_path) as f:
+                scene_camera = json.load(f)
+            intrinsic = np.array(scene_camera[str(imgId)]['cam_K']).reshape((3, 3))
+            return _6d_grasp.to_rect_grasp_group(camera, intrinsic=intrinsic)
 
     def loadData(self, ids=None, *extargs):
         '''

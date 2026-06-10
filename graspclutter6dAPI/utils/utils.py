@@ -633,7 +633,7 @@ def get_obj_pose_list(camera_pose, pose_vectors):
 
     return obj_list, pose_list
 
-def batch_rgbdxyz_2_rgbxy_depth(points, camera):
+def batch_rgbdxyz_2_rgbxy_depth(points, camera, intrinsic=None):
     '''
     **Input:**
 
@@ -641,13 +641,15 @@ def batch_rgbdxyz_2_rgbxy_depth(points, camera):
 
     - camera: string of the camera type
 
+    - intrinsic: optional np.array(3,3) of the camera intrinsic matrix. If given, overrides camera.
+
     **Output:**
 
     - coords: float of xy in pixel frame [-1, 2]
 
     - depths: float of the depths of pixel frame [-1]
     '''
-    intrinsics = get_camera_intrinsic(camera)
+    intrinsics = get_camera_intrinsic(camera) if intrinsic is None else intrinsic
     fx, fy = intrinsics[0,0], intrinsics[1,1]
     cx, cy = intrinsics[0,2], intrinsics[1,2]
     s = 1000.0
@@ -689,25 +691,27 @@ def get_batch_key_points(centers, Rs, widths):
     key_points = key_points + centers[:,np.newaxis,:]
     return key_points
 
-def batch_key_points_2_tuple(key_points, scores, object_ids, camera):
+def batch_key_points_2_tuple(key_points, scores, object_ids, camera, intrinsic=None):
     '''
     **Input:**
 
     - key_points: np.array(-1,4,3) of grasp key points, definition is shown in key_points.png
-    
+
     - scores: numpy array of batch grasp scores.
 
     - camera: string of 'realsense' or 'kinect'.
+
+    - intrinsic: optional np.array(3,3) of the camera intrinsic matrix. If given, overrides camera.
 
     **Output:**
 
     - np.array([center_x,center_y,open_x,open_y,height])
     '''
     import numpy as np
-    centers, _ = batch_rgbdxyz_2_rgbxy_depth(key_points[:,0,:], camera)
-    opens, _ = batch_rgbdxyz_2_rgbxy_depth(key_points[:,1,:], camera)
-    lefts, _ = batch_rgbdxyz_2_rgbxy_depth(key_points[:,2,:], camera)
-    rights, _ = batch_rgbdxyz_2_rgbxy_depth(key_points[:,3,:], camera)
+    centers, _ = batch_rgbdxyz_2_rgbxy_depth(key_points[:,0,:], camera, intrinsic)
+    opens, _ = batch_rgbdxyz_2_rgbxy_depth(key_points[:,1,:], camera, intrinsic)
+    lefts, _ = batch_rgbdxyz_2_rgbxy_depth(key_points[:,2,:], camera, intrinsic)
+    rights, _ = batch_rgbdxyz_2_rgbxy_depth(key_points[:,3,:], camera, intrinsic)
     heights = np.linalg.norm(lefts - rights, axis=-1, keepdims=True)
     tuples = np.concatenate([centers, opens, heights, scores[:, np.newaxis], object_ids[:, np.newaxis]], axis=-1).astype(np.float32)
     return tuples

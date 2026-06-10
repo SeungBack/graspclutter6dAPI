@@ -503,14 +503,16 @@ class GraspGroup():
         shuffled_grasp_group.grasp_group_array = copy.deepcopy(shuffled_grasp_group_array[:numGrasp])
         return shuffled_grasp_group
 
-    def to_rect_grasp_group(self, camera):
+    def to_rect_grasp_group(self, camera, intrinsic=None):
         '''
         **Input:**
 
         - camera: string of type of camera, 'realsense' or 'kinect'.
 
+        - intrinsic: optional np.array(3,3) of the camera intrinsic matrix. If given, overrides camera.
+
         **Output:**
-        
+
         - RectGraspGroup instance or None.
         '''
         tranlations = self.translations
@@ -534,7 +536,7 @@ class GraspGroup():
         k_points = get_batch_key_points(tranlations, rotations, widths)
         k_points = k_points.reshape([-1, 3])
         k_points = k_points.reshape([-1, 4, 3])
-        rect_grasp_group_array = batch_key_points_2_tuple(k_points, scores, object_ids, camera)
+        rect_grasp_group_array = batch_key_points_2_tuple(k_points, scores, object_ids, camera, intrinsic)
         rect_grasp_group = RectGraspGroup()
         rect_grasp_group.rect_grasp_group_array = rect_grasp_group_array
         return rect_grasp_group
